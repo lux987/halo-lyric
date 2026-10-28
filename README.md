@@ -1,79 +1,112 @@
-﻿# Halo PixelBar 姝岃瘝锛團olia 妯＄粍锛?
-鎶?[Folia](https://github.com/chthollyphile/folia-major) 姝ｅ湪鎾斁鐨勬瓕璇嶈锛屽疄鏃舵帹鍒?**鑺卞啀 Halo PixelBar** 闊冲搷鐨勭偣闃靛睆涓娿€?
-> 璇存槑锛欶olia 鑷甫鐨勬瓕璇嶅彧鍦ㄧ數鑴戝睆骞曚笂鐐紱杩欎釜妯＄粍鎶婂悓涓€浠芥瓕璇嶅彂鍒伴煶鍝嶇殑灏忓睆銆?
+# Halo PixelBar 歌词（Folia 模组）
+
+把 [Folia](https://github.com/chthollyphile/folia-major) 正在播放的歌词行，实时推到
+**花再 Halo PixelBar** 音响的点阵屏上。
+
+> Folia 的歌词只在电脑屏幕上炫；这个模组把同一份歌词发到音响的小屏。
+
 ---
 
-## 鍔熻兘
+## 功能
 
-- **杩涘害璺熼殢**锛氭寜褰撳墠鍞卞埌鐨勫瓧绠楃獥鍙ｄ綅缃紝闀垮彞鍦ㄥ睆涓婂寑閫熸粦鍔紝涓嶄細瓒婃粴瓒婅惤鍚?- **浜旂鎹㈣鍔ㄧ敾**锛氶€愬瓧鎵撳嚭 / 浠庡彸婊戝叆 / 闂儊 / 鍙岄棯 / 鎿﹂櫎鍚庨噸鎵?- **寤惰繜琛ュ伩**锛毬?000ms锛岀敤浜庡榻?Folia 鐨勬瓕璇嶅亸绉?- **鍙皟绐楀彛**锛氭瘡甯у瓧鏁般€佹粦鍔ㄦ闀裤€佸抚闂撮殧銆佹枃瀛楀竷灞€锛堟媺浼搁摵婊?/ 灞呬腑 / 闈犲乏 / 闈犲彸锛?- **閫€鍑鸿繕鍘?*锛欶olia 鍏抽棴鍚庯紝灞忓箷鑷姩鍥炲埌鏃堕挓寰呮満鐣岄潰锛屼笉浼氬仠鍦ㄦ渶鍚庝竴鍙ユ瓕璇嶄笂
+- **进度跟随**：按当前唱到的字算窗口位置，长句在屏上匀速滑动，不会越滚越落后
+- **五种换行动画**：逐字打出 / 从右滑入 / 闪烁 / 双闪 / 擦除后重打
+- **延迟补偿**：±2000ms，用于对齐 Folia 的歌词偏移
+- **可调窗口**：每帧字数、滑动步长、帧间隔、文字布局（拉伸铺满 / 居中 / 靠左 / 靠右）
+- **退出还原**：Folia 关闭后，屏幕自动回到时钟待机界面，不会停在最后一句歌词上
 
-## 瀹冩€庝箞宸ヤ綔
+## 它怎么工作
 
 ```
-Folia锛圗lectron / Folium 妯＄粍锛?   鈹? 姣?60ms 璇?playback.getState() + lyrics.getLines()
-   鈹? 鎸夋挱鏀捐繘搴︾畻绐楀彛锛孭OST JSON
-   鈻?http://127.0.0.1:8765/state
-   鈻?HaloBridge锛圥ython锛岄厤濂楃▼搴忥級
-   鈹? 鎵撳寘鎴?64 瀛楄妭 HID 甯?   鈻?鑺卞啀 Halo PixelBar 鐐归樀灞忥紙USB HID锛孷ID 2D99 / PID A106锛?```
+Folia（Electron / Folium 模组）
+   │  每 60ms 读 playback.getState() + lyrics.getLines()
+   │  按播放进度算窗口，POST JSON
+   ▼
+http://127.0.0.1:8765/state
+   ▼
+HaloBridge（Windows 端，配套程序）
+   │  打包成 64 字节 HID 帧
+   ▼
+花再 Halo PixelBar 点阵屏（USB HID，VID 2D99 / PID A106）
+```
 
-妯＄粍鏈韩**涓嶇洿鎺ュ啓纭欢**锛欶olia 鐨勬ā缁勮繍琛屽湪娓叉煋杩涚▼閲岋紝纰颁笉鍒?USB HID銆?鎵€浠ラ渶瑕佷竴涓湰鏈烘ˉ鎺ョ▼搴忥紝涓よ€呯敤 HTTP 閫氫俊銆?
-## 鍓嶇疆鏉′欢
+模组本身**不直接写硬件**：Folia 的模组运行在渲染进程里，碰不到 USB HID。
+所以需要一个本机桥接程序，两者用 HTTP 通信。
 
-| 椤?| 瑕佹眰 |
+## 前置条件
+
+| 项 | 要求 |
 |---|---|
-| 绯荤粺 | Windows |
-| 闊冲搷 | 鑺卞啀 Halo PixelBar锛?*USB 杩炴帴**锛堣摑鐗欏彧浼犻煶棰戯紝涓嶄紶灞忓箷鏁版嵁锛?|
-| Python | 3.9+锛堣妗ユ帴绋嬪簭鐢級 |
-| 鍐茬獊 | **蹇呴』鍏抽棴 EDIFIER TempoHub**锛屽惁鍒欎袱涓▼搴忔姠鍚屼竴涓?HID 閫氶亾锛屾瓕璇嶄細涔辫烦 |
+| 系统 | Windows |
+| 音响 | 花再 Halo PixelBar，**USB 连接**（蓝牙只传音频，不传屏幕数据） |
+| 桥接 | `dist/HaloBridge.exe`（免 Python）；或源码运行需 Python 3.9+ |
+| 冲突 | **必须关闭 EDIFIER TempoHub**，否则两个程序抢同一个 HID 通道，歌词会乱跳 |
 
-## 瀹夎
+## 安装
 
-### 1. 瑁呮ˉ鎺ョ▼搴?
-涓嬭浇 `dist/HaloBridge-v1.0.0.zip`锛岃В鍘嬪埌鍥哄畾鐩綍锛堜緥濡?`D:\HaloBridge`锛夛紝鐒跺悗锛?
-```bat
-install_bridge.bat     :: 寤?venv + 瑁?hidapi
-start_bridge.bat       :: 鎵嬪姩娴嬭瘯锛堜細甯︾獥鍙ｏ紝娴嬪畬鍏虫帀锛?```
+### 1. 装桥接程序
 
-鏃ュ父浣跨敤涓嶉渶瑕佹墜鍔ㄥ紑锛歚watch_folia.py` 鏄湅闂ㄧ嫍锛孎olia 鎵撳紑鎵嶅惎鍔ㄦˉ鎺ャ€丗olia 鍏抽棴灏辩粨鏉熸ˉ鎺ャ€?鎶婂畠鏀捐繘鍚姩鏂囦欢澶瑰嵆鍙紑鏈鸿嚜鍚紙骞虫椂涓嶅崰璧勬簮锛夛細
+**推荐直接用 exe，不需要装 Python：** `dist/HaloBridge.exe`（约 8 MB）。
+
+1. 放到固定目录，例如 `D:\HaloBridge\HaloBridge.exe`
+2. 双击运行一次（无窗口，后台常驻）
+3. 把它的快捷方式放进启动文件夹：
 
 ```
 %APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup
 ```
 
-### 2. 瑁呮ā缁?
-鎶?`dist/halo-lyric-v1.0.0.zip` 鎷栬繘 Folia 鐨勬ā缁勯潰鏉?鈫?銆岄噸杞姐€嶁啋 鍚敤
-銆孒alo PixelBar 姝岃瘝銆嶁啋 纭锛堟湭绛惧悕鎻愮ず灞炴甯革級銆?
-### 3. 鏀炬瓕
+它自己看 Folia 在不在：Folia 打开就接管屏幕显示歌词，Folia 关闭就把屏幕还原成时钟再停手。
 
-Folia 鏀句竴棣栨湁姝岃瘝鐨勬瓕锛岄煶鍝嶅睆骞曞氨寮€濮嬫樉绀恒€?
-## 璁剧疆
+从源码运行（需要 Python 3.9+）：解压 `dist/HaloBridge-v1.0.1.zip`，运行 `install_bridge.bat` 建环境，
+再用 `python halo_agent.py` 启动。
 
-Folia 鈫?璁剧疆 鈫?妯＄粍 鈫?Halo PixelBar 姝岃瘝
+### 2. 装模组
 
-| 璁剧疆 | 榛樿 | 璇存槑 |
+把 `dist/halo-lyric-v1.0.1.zip` 拖进 Folia 的模组面板 → 「重载」→ 启用
+「Halo PixelBar 歌词」→ 确认（未签名提示属正常）。
+
+### 3. 放歌
+
+Folia 放一首有歌词的歌，音响屏幕就开始显示。
+
+## 设置
+
+Folia → 设置 → 模组 → Halo PixelBar 歌词
+
+| 设置 | 默认 | 说明 |
 |---|---|---|
-| 璺熼殢鎾斁杩涘害 | 寮€ | 鍏虫帀鍒欐寜鍥哄畾鑺傚鍖€閫熸粴 |
-| 寤惰繜琛ュ伩锛堟绉掞級 | 0 | 姝岃瘝姣斿０闊虫櫄灏卞～璐熸暟锛堝 鈭?00锛夛紝鏃╁氨濉鏁?|
-| 鎹㈣鍔ㄧ敾 | 閫愬瓧鎵撳嚭 | 浜旂杩涘満鏁堟灉 |
-| 婊戝姩甯ч棿闅?| 220ms | 鍏抽棴璺熼殢鍚庣敓鏁?|
-| 姣忓抚浣嶇Щ | 1 瀛?| 鍏抽棴璺熼殢鍚庣敓鏁?|
-| 绐楀彛瀛楁暟 | 16 | 涓€灞忓嚑涓瓧锛屾媺浼稿竷灞€涓嬭秺澶氳秺鎵?|
-| 鏂囧瓧甯冨眬 | 鎷変几閾烘弧 | 鎷変几 / 灞呬腑 / 闈犲乏 / 闈犲彸 |
+| 跟随播放进度 | 开 | 关掉则按固定节奏匀速滚 |
+| 延迟补偿（毫秒） | 0 | 歌词比声音晚就填负数（如 −300），早就填正数 |
+| 换行动画 | 逐字打出 | 五种进场效果 |
+| 滑动帧间隔 | 220ms | 关闭跟随后生效 |
+| 每帧位移 | 1 字 | 关闭跟随后生效 |
+| 窗口字数 | 16 | 一屏几个字，拉伸布局下越多越扁 |
+| 文字布局 | 拉伸铺满 | 拉伸 / 居中 / 靠左 / 靠右 |
 
-## 鐩綍缁撴瀯
+## 目录结构
 
 ```
-mod/       Folia 妯＄粍锛坢od.json銆乧lient.mjs锛?bridge/    HaloBridge 妗ユ帴绋嬪簭锛圥ython锛?dist/      鍙戝竷鍖咃紙涓や釜 zip锛変笌鍙戝竷璇存槑
+mod/       Folia 模组（mod.json、client.mjs、preview.png）
+bridge/    HaloBridge 源码（halo_agent.py 单进程版）
+dist/      发布包：模组 zip、桥接 zip、HaloBridge.exe
 ```
 
-## 宸茬煡闄愬埗
+## 已知限制
 
-- 浠?Windows + Halo PixelBar锛圲SB锛?- 涓€甯ф渶澶氱害 50 瀛楄妭 鈮?16 涓眽瀛楋紝闀垮彞闈犳粦绐?- 鐐归樀灞忔病鏈変寒搴﹂€氶亾锛屽仛涓嶄簡娣″叆娣″嚭
-- 閫€鍑鸿繕鍘熷彧鑳藉洖鍒板唴缃?UI 妯″紡锛堟椂閽?娓告垙/宸ヤ綔鈥︼級锛屾棤娉曡繕鍘?TempoHub 閲岀殑鑷畾涔夊绾稿浘鐗?
-## 鍗忚鍙傝€?
-64 瀛楄妭 HID 鍐欏叆锛屽抚澶?`2E AA EC E8`锛堟枃鏈級/ `2E AA EC EF`锛堝竷灞€涓?UI 妯″紡锛夛紝
-闀垮害灏忕銆乁TF-8 鏂囨湰銆佹牎楠屽拰 `acc = 128; for b: acc += b + 2; acc % 256`銆?
-鍙傝€冨疄鐜帮細[HaloPixelToolBox](https://github.com/XFEstudio/HaloPixelToolBox)銆?[HaloLyricSync](https://github.com/nxz1026/HaloLyricSync)銆?
+- 仅 Windows + Halo PixelBar（USB）
+- 一帧最多约 50 字节 ≈ 16 个汉字，长句靠滑窗
+- 点阵屏没有亮度通道，做不了淡入淡出
+- 退出还原只能回到内置 UI 模式（时钟/游戏/工作…），无法还原 TempoHub 里的自定义壁纸图片
+
+## 协议参考
+
+64 字节 HID 写入，帧头 `2E AA EC E8`（文本）/ `2E AA EC EF`（布局与 UI 模式），
+长度小端、UTF-8 文本、校验和 `acc = 128; for b: acc += b + 2; acc % 256`。
+
+参考实现：[HaloPixelToolBox](https://github.com/XFEstudio/HaloPixelToolBox)、
+[HaloLyricSync](https://github.com/nxz1026/HaloLyricSync)。
+
 ## License
 
-鏈寚瀹氥€備娇鐢ㄦ垨鍒嗗彂鍓嶈鍏堣仈绯讳綔鑰呫€?
+MIT
