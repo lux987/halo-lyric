@@ -1,0 +1,48 @@
+Halo PixelBar 歌词 —— Folia 模组发布包
+========================================
+
+版本：1.0.0
+作者：dsh
+更新：2026-10-29
+
+包内文件
+--------
+1. halo-lyric-v1.0.0.zip
+   Folia 模组本体（拖进 Folia 模组面板即可安装）：
+     halo-lyric/mod.json
+     halo-lyric/client.mjs
+     halo-lyric/README.md
+
+2. HaloBridge-v1.0.0.zip
+   配套的 Windows 桥接程序（必须装，否则模组装上了也不会往屏幕写字）：
+     halo_bridge.py      HID 写入服务，监听 127.0.0.1:8765
+     watch_folia.py      看门狗：Folia 开才启动桥接，Folia 关就结束
+     install_bridge.bat  一键装环境（建 venv + 装 hidapi）
+     start_bridge.bat    手动启动（调试用，会带窗口）
+     README.md           安装与排查说明
+
+使用顺序
+--------
+1. 解压 HaloBridge-v1.0.0.zip 到固定目录（例如 D:\HaloBridge）
+2. 双击 install_bridge.bat（需要 Python 3.9+）
+3. 把 halo-lyric-v1.0.0.zip 拖进 Folia 模组面板 → 重载 → 启用并确认
+4. 关闭 EDIFIER TempoHub（会和桥接抢同一个 HID 通道）
+5. 放歌
+
+日常：把 HaloBridge 目录里的看门狗启动项放进
+   %APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup
+之后 Folia 开就自动有歌词，Folia 关就自动退出，无窗口。
+
+技术要点
+--------
+- 屏幕协议：64 字节 HID 写入，VID 2D99 / PID A106，帧头 2E AA EC E8
+- 模组权限：net.fetch（只往本机 127.0.0.1:8765 发数据）
+- 长歌词：滑窗显示，窗口跟随歌词进度
+- 换行动画：逐字打出 / 从右滑入 / 闪烁 / 双闪 / 擦除后重打
+- 延迟补偿：-2000 ~ +2000 毫秒，用于校准 Folia 的歌词偏移
+
+已知限制
+--------
+- 仅 Windows + Halo PixelBar（USB 连接）
+- 一行最多约 16 个汉字（协议包 64 字节限制）
+- 点阵屏无亮度通道，做不了淡入淡出
